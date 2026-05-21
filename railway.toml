@@ -1,0 +1,17 @@
+# Railway deployment config — https://docs.railway.com/reference/config-as-code
+# Deploy with: ./scripts/deploy_railway.sh
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+startCommand = "./scripts/start.sh"
+healthcheckPath = "/health"
+healthcheckTimeout = 120
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 5
+
+# Optional volume for temp uploads (persisted files go to Supabase proofs bucket):
+#   DATA_DIR=/data/data
+# Mount path example: /data

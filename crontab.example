@@ -1,0 +1,13 @@
+# Sentiment Engine — daily re-analysis at midnight (system local time)
+#
+# Install:
+#   chmod +x scripts/cron_daily_analysis.sh
+#   crontab -e
+#   Paste the line below (adjust /path/to/sentiment-engine)
+#
+# Logs: logs/cron.log and logs/daily_analysis.log
+
+0 0 * * * /path/to/sentiment-engine/scripts/cron_daily_analysis.sh
+
+# Optional: use UTC midnight instead of local time
+# 0 0 * * * TZ=UTC /path/to/sentiment-engine/scripts/cron_daily_analysis.sh

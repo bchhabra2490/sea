@@ -1,0 +1,20 @@
+# Supabase local development config
+# https://supabase.com/docs/guides/cli/config
+
+project_id = "sentiment-engine"
+
+[api]
+enabled = true
+port = 54321
+
+[db]
+port = 54322
+major_version = 15
+
+[storage]
+enabled = true
+
+[storage.buckets.proofs]
+public = false
+file_size_limit = "50MiB"
+allowed_mime_types = ["text/plain", "text/csv", "application/json", "application/jsonl", "application/csv", "application/octet-stream"]
