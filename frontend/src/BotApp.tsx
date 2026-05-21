@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Bot, ExternalLink, Loader2, RefreshCw } from "lucide-react";
+import { BookOpen, Bot, ExternalLink, Loader2, RefreshCw } from "lucide-react";
 import { fetchBotStatus, fetchPipelineStatus } from "@/lib/api";
 import type { BotStatusResponse, PipelineStatusResponse } from "@/types";
 import { ChatBot } from "@/components/ChatBot";
@@ -59,6 +59,12 @@ export default function BotApp() {
             >
               <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
               Refresh
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <a href="/integrate">
+                <BookOpen className="h-4 w-4" />
+                Integrate
+              </a>
             </Button>
             <Button variant="outline" size="sm" asChild>
               <a href="/">

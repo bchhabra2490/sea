@@ -1,4 +1,5 @@
 import type {
+  BotDocsResponse,
   BotChatResponse,
   BotClassifyResponse,
   BotHistoryResponse,
@@ -49,6 +50,23 @@ export async function startAnalysis(
       ...(inputPath ? { input_path: inputPath } : {}),
     }),
   });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json();
+}
+
+/** Load data/sample_conversations.jsonl into Supabase, then run the pipeline. */
+export async function startSampleAnalysis(force = true): Promise<JobStartResponse> {
+  const res = await fetch(`${API_BASE}/analyze/sample`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ force_recompute: force }),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json();
+}
+
+export async function fetchBotDocs(): Promise<BotDocsResponse> {
+  const res = await fetch(`${API_BASE}/bot/docs`);
   if (!res.ok) throw new Error(await parseError(res));
   return res.json();
 }

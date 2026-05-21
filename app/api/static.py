@@ -9,6 +9,7 @@ from fastapi.staticfiles import StaticFiles
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 FRONTEND_DIST = PROJECT_ROOT / "frontend" / "dist"
 BOT_HTML = FRONTEND_DIST / "bot.html"
+INTEGRATE_HTML = FRONTEND_DIST / "bot-docs.html"
 
 # First path segments reserved for JSON API (not SPA HTML).
 _API_PREFIXES = (
@@ -55,6 +56,16 @@ def mount_frontend(app) -> bool:
                 detail="Bot UI not built. Run scripts/build_frontend.sh",
             )
         return FileResponse(BOT_HTML)
+
+    @spa_router.get("/integrate")
+    async def bot_integration_docs_ui() -> FileResponse:
+        """Bot integration API guide (React UI)."""
+        if not INTEGRATE_HTML.exists():
+            raise HTTPException(
+                status_code=404,
+                detail="Integration docs not built. Run scripts/build_frontend.sh",
+            )
+        return FileResponse(INTEGRATE_HTML)
 
     @spa_router.get("/{full_path:path}")
     async def spa_fallback(full_path: str) -> FileResponse:

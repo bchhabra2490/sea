@@ -91,12 +91,16 @@ export interface ClusterMatch {
 }
 
 export interface BotClassifyResponse {
+  conversation_id: string;
   message: string;
   processed_text: string;
   nearest: ClusterMatch;
   alternatives: ClusterMatch[];
   is_noise: boolean;
   min_similarity: number;
+  cluster_id: number;
+  stored: boolean;
+  appended_to: string;
 }
 
 export interface BotStatusResponse {
@@ -136,4 +140,45 @@ export interface BotHistoryItem {
 
 export interface BotHistoryResponse {
   messages: BotHistoryItem[];
+}
+
+export interface BotDocsEndpoint {
+  method: string;
+  path: string;
+  description: string;
+  auth?: string | null;
+  request_body?: Record<string, string> | null;
+  query_params?: Record<string, string>;
+  response_fields?: string[];
+}
+
+export interface BotDocsExample {
+  title: string;
+  curl?: string;
+  note?: string;
+  json?: Record<string, unknown>;
+}
+
+export interface BotDocsFlowStep {
+  step: number;
+  title: string;
+  detail: string;
+}
+
+export interface BotDocsResponse {
+  title: string;
+  version: string;
+  description: string;
+  integration_guide_url: string;
+  prerequisites: string[];
+  realtime_flow: BotDocsFlowStep[];
+  classification: {
+    threshold: {
+      min_cluster_similarity: number;
+      description: string;
+    };
+    endpoints: BotDocsEndpoint[];
+    examples: BotDocsExample[];
+  };
+  errors: Array<{ status: number; meaning: string }>;
 }

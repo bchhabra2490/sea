@@ -74,7 +74,13 @@ class AnalysisPipeline:
                 logger.info("Starting pipeline for file %s (run %s)", path, run_id)
                 db_progress("ingesting", f"Loading conversations from {path.name}")
                 raw = load_conversations(path)
-                source = "upload" if "uploads" in path.parts else "jsonl"
+                resolved = path.resolve()
+                if resolved == self.settings.sample_conversations_path.resolve():
+                    source = "sample"
+                elif "uploads" in path.parts:
+                    source = "upload"
+                else:
+                    source = "jsonl"
             else:
                 logger.info("Starting pipeline from database (run %s)", run_id)
                 db_progress("ingesting", "Loading conversations from Supabase")

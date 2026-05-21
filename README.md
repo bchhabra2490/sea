@@ -304,8 +304,9 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
 | URL | Format | Description |
 |-----|--------|-------------|
-| [/api/docs](/api/docs) | JSON | Endpoint catalog + classification curl examples |
-| [/docs](/docs) | OpenAPI | Interactive Swagger UI |
+| [/integrate](/integrate) | UI | Bot integration API guide (real-time messages) |
+| [/bot/docs](/bot/docs) | JSON | Bot API catalog for integrators |
+| [/docs](/docs) | OpenAPI | Full platform Swagger UI |
 
 ### Endpoints
 
@@ -313,12 +314,15 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 |--------|------|-------------|
 | `GET` | `/` | Insights dashboard (when `frontend/dist` exists) |
 | `GET` | `/health` | Health check |
-| `GET` | `/api/docs` | API catalog JSON (classification usage) |
+| `GET` | `/integrate` | Bot integration docs UI |
+| `GET` | `/bot/docs` | Bot API catalog JSON |
 | `GET` | `/insights` | Aggregated dashboard payload |
 | `GET` | `/bot/status` | Whether real-time classification is available |
-| `POST` | `/bot/classify` | Embed a message and assign nearest topic cluster |
+| `POST` | `/bot/classify` | Classify a user message and persist to Supabase (no agent reply) |
+| `POST` | `/bot/chat` | Classify, agent reply, and persist turn to Supabase |
 | `GET` | `/pipeline/status` | Background pipeline job status (poll while running) |
 | `POST` | `/analyze` | Start full pipeline in background |
+| `POST` | `/analyze/sample` | Load `data/sample_conversations.jsonl` into DB, then run pipeline |
 | `POST` | `/analyze/upload` | Upload JSONL or CSV and start pipeline in background |
 | `GET` | `/topics` | Topic labels per cluster |
 | `GET` | `/clusters` | Per-conversation cluster IDs |

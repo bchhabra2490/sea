@@ -18,6 +18,7 @@ export default defineConfig({
       input: {
         main: `${root}/index.html`,
         bot: `${root}/bot.html`,
+        integrate: `${root}/bot-docs.html`,
       },
     },
   },

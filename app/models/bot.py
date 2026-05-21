@@ -25,14 +25,18 @@ class ClusterMatch(BaseModel):
 
 
 class BotClassifyResponse(BaseModel):
-    """Result of classifying one message in real time."""
+    """Result of classifying one message in real time (persisted to Supabase)."""
 
+    conversation_id: str
     message: str
     processed_text: str
     nearest: ClusterMatch
     alternatives: list[ClusterMatch] = Field(default_factory=list)
     is_noise: bool = Field(description="True when similarity is below confidence threshold")
     min_similarity: float
+    cluster_id: int = Field(description="Assigned cluster, or -1 when is_noise")
+    stored: bool = True
+    appended_to: str = "supabase"
 
 
 class BotStatusResponse(BaseModel):

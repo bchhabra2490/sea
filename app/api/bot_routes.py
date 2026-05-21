@@ -2,8 +2,8 @@
 
 from fastapi import APIRouter, HTTPException
 
+from app.api.bot_docs_content import build_bot_docs
 from app.api.bot_service import get_bot_service
-from app.clustering.nearest_cluster import NearestClusterFinder
 from app.models.bot import (
     BotChatRequest,
     BotChatResponse,
@@ -11,7 +11,6 @@ from app.models.bot import (
     BotClassifyResponse,
     BotHistoryResponse,
     BotStatusResponse,
-    ClusterMatch,
 )
 from app.utils.config import get_settings
 from app.utils.logging import get_logger
@@ -19,22 +18,22 @@ from app.utils.logging import get_logger
 logger = get_logger(__name__)
 router = APIRouter(prefix="/bot", tags=["bot"])
 
-_finder: NearestClusterFinder | None = None
-
-
-def get_finder() -> NearestClusterFinder:
-    global _finder  # noqa: PLW0603
-    if _finder is None:
-        _finder = NearestClusterFinder(get_settings())
-    return _finder
-
-
 def _require_api_key() -> None:
     if not get_settings().openai_api_key:
         raise HTTPException(
             status_code=400,
             detail="OPENAI_API_KEY is not configured. Set it in .env or environment.",
         )
+
+
+@router.get("/docs")
+def bot_integration_docs() -> dict:
+    """
+    Bot integration API catalog (JSON).
+
+    Human-readable guide: GET /integrate (when frontend is built).
+    """
+    return build_bot_docs()
 
 
 @router.get("/status", response_model=BotStatusResponse)
@@ -90,28 +89,21 @@ def bot_chat(request: BotChatRequest) -> BotChatResponse:
 @router.post("/classify", response_model=BotClassifyResponse)
 def classify_message(request: BotClassifyRequest) -> BotClassifyResponse:
     """
-    Embed a user message and assign it to the nearest topic cluster (no chat persistence).
+    Classify a user message, assign the nearest topic cluster, and persist to Supabase.
     """
     _require_api_key()
-    finder = get_finder()
-    if not finder.is_ready():
+    service = get_bot_service()
+    if not service.is_ready():
         raise HTTPException(
             status_code=404,
             detail="No clusters available. Run POST /analyze and wait for completion.",
         )
     try:
-        result = finder.classify(request.message.strip(), top_k=request.top_k)
+        result = service.classify_and_store(request.message.strip(), top_k=request.top_k)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     except Exception as exc:  # noqa: BLE001
         logger.exception("Bot classification failed")
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
-    return BotClassifyResponse(
-        message=result["message"],
-        processed_text=result["processed_text"],
-        nearest=ClusterMatch(**result["nearest"]),
-        alternatives=[ClusterMatch(**a) for a in result["alternatives"]],
-        is_noise=result["is_noise"],
-        min_similarity=result["min_similarity"],
-    )
+    return BotClassifyResponse(**result)

@@ -572,7 +572,41 @@ class AnalysisRepository:
             "is_noise": is_noise,
             "min_similarity": min_similarity,
             "run_id": run_id,
+            "vector": vector,
         }
+
+    def register_classified_message(
+        self,
+        run_id: str,
+        external_id: str,
+        user_text: str,
+        processed_text: str,
+        vector: np.ndarray,
+        cluster_id: int,
+        agent_text: str | None = None,
+        timestamp: str | None = None,
+    ) -> str:
+        """Persist a bot turn: user message, optional assistant reply, embedding, and cluster."""
+        messages = [Message(role="user", content=user_text)]
+        if agent_text is not None:
+            messages.append(Message(role="assistant", content=agent_text))
+
+        conv = Conversation(
+            conversation_id=external_id,
+            messages=messages,
+            timestamp=timestamp,
+        )
+        conv_uuid = self.upsert_conversations([conv], source="bot")[external_id]
+        id_map = {external_id: conv_uuid}
+        proc = ProcessedConversation(
+            conversation_id=external_id,
+            text=processed_text,
+            timestamp=timestamp,
+        )
+        self.save_processed_texts(run_id, [proc], id_map)
+        self.save_embeddings(run_id, vector.reshape(1, -1), [proc], id_map)
+        self.save_cluster_assignments(run_id, [proc], [cluster_id], id_map)
+        return conv_uuid
 
     def register_bot_message(
         self,
@@ -585,17 +619,16 @@ class AnalysisRepository:
         cluster_id: int,
         timestamp: str | None = None,
     ) -> str:
-        conv_uuid = self.upsert_bot_conversation(external_id, user_text, agent_text, timestamp)
-        id_map = {external_id: conv_uuid}
-        proc = ProcessedConversation(
-            conversation_id=external_id,
-            text=processed_text,
+        return self.register_classified_message(
+            run_id,
+            external_id,
+            user_text,
+            processed_text,
+            vector,
+            cluster_id,
+            agent_text=agent_text,
             timestamp=timestamp,
         )
-        self.save_processed_texts(run_id, [proc], id_map)
-        self.save_embeddings(run_id, vector.reshape(1, -1), [proc], id_map)
-        self.save_cluster_assignments(run_id, [proc], [cluster_id], id_map)
-        return conv_uuid
 
     def get_bot_history(self, limit: int = 50) -> list[dict]:
         rows = (

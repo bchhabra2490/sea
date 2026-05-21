@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import {
+  BookOpen,
   Loader2,
   MessageSquare,
   Play,
@@ -106,6 +107,17 @@ export function InsightsHeader({
                 <MessageSquare className="h-4 w-4" />
               </a>
             </Button>
+            <Button variant="ghost" size="sm" className="hidden px-2 sm:inline-flex" asChild>
+              <a href="/integrate" title="Bot integration API">
+                <BookOpen className="h-4 w-4" />
+                Integrate
+              </a>
+            </Button>
+            <Button variant="ghost" size="sm" className="h-9 w-9 p-0 sm:hidden" asChild>
+              <a href="/integrate" title="Bot integration API">
+                <BookOpen className="h-4 w-4" />
+              </a>
+            </Button>
           </nav>
         </div>
 
@@ -129,6 +141,7 @@ export function InsightsHeader({
                 onClick={onStartAnalysis}
                 disabled={actionsDisabled}
                 className="shrink-0"
+                title="Load data/sample_conversations.jsonl into Supabase and run analysis"
               >
                 {starting || pipelineBusy ? (
                   <Loader2 className="h-4 w-4 animate-spin" />

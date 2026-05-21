@@ -54,6 +54,15 @@ class Settings(BaseModel):
     project_root: Path = Field(default_factory=lambda: Path(__file__).resolve().parents[2])
     data_dir: Path = Field(default_factory=lambda: Path(__file__).resolve().parents[2] / "data")
 
+    @property
+    def sample_conversations_path(self) -> Path:
+        """Bundled demo JSONL at project_root/data (not DATA_DIR uploads volume)."""
+        override = os.getenv("SAMPLE_CONVERSATIONS_PATH")
+        if override:
+            p = Path(override)
+            return p if p.is_absolute() else self.project_root / p
+        return self.project_root / "data" / "sample_conversations.jsonl"
+
     @classmethod
     def from_env(cls, env_file: str | Path = ".env") -> "Settings":
         """Load settings from environment variables and optional .env file."""

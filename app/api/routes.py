@@ -80,6 +80,24 @@ def analyze(request: AnalyzeRequest) -> JobStartResponse:
     return _start_background(input_path, request.force_recompute)
 
 
+@router.post("/analyze/sample", response_model=JobStartResponse)
+def analyze_sample(request: AnalyzeRequest | None = None) -> JobStartResponse:
+    """
+    Load bundled sample JSONL into Supabase (conversations + messages), then run the pipeline.
+
+    Uses ``data/sample_conversations.jsonl`` (or ``SAMPLE_CONVERSATIONS_PATH``).
+    """
+    settings = get_settings()
+    sample_path = settings.sample_conversations_path.resolve()
+    if not sample_path.exists():
+        raise HTTPException(
+            status_code=404,
+            detail=f"Sample file not found: {sample_path}",
+        )
+    force = request.force_recompute if request is not None else True
+    return _start_background(sample_path, force)
+
+
 @router.post("/analyze/upload", response_model=JobStartResponse)
 async def analyze_upload(
     file: UploadFile = File(

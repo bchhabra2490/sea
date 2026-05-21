@@ -4,7 +4,7 @@ import {
   fetchInsights,
   fetchPipelineStatus,
   resetAllData,
-  startAnalysis,
+  startSampleAnalysis,
 } from "@/lib/api";
 import type { InsightsResponse, PipelineStatusResponse } from "@/types";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -81,7 +81,7 @@ export function InsightsDashboard() {
     setStarting(true);
     setError(null);
     try {
-      await startAnalysis(true);
+      await startSampleAnalysis(true);
       await loadPipelineStatus();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to start analysis");
@@ -188,9 +188,10 @@ export function InsightsDashboard() {
             <AlertTitle>No analysis yet</AlertTitle>
             <AlertDescription className="space-y-3">
               <p>
-                Upload a <code className="rounded bg-muted px-1">.jsonl</code> or{" "}
-                <code className="rounded bg-muted px-1">.csv</code> file, or click Run analysis to
-                process all conversations already in Supabase. Ensure{" "}
+                Click <strong>Sample data</strong> to load the bundled demo file, upload a{" "}
+                <code className="rounded bg-muted px-1">.jsonl</code> or{" "}
+                <code className="rounded bg-muted px-1">.csv</code>, or ensure conversations already
+                exist in Supabase. Ensure{" "}
                 <code className="rounded bg-muted px-1">OPENAI_API_KEY</code> and Supabase env vars
                 are set.
               </p>
