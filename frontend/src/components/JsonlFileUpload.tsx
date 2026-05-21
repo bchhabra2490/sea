@@ -13,11 +13,17 @@ function isAcceptedFile(file: File): boolean {
 
 interface ConversationFileUploadProps {
   disabled?: boolean;
+  compact?: boolean;
   onStarted: () => void;
   onError: (message: string) => void;
 }
 
-export function JsonlFileUpload({ disabled, onStarted, onError }: ConversationFileUploadProps) {
+export function JsonlFileUpload({
+  disabled,
+  compact = false,
+  onStarted,
+  onError,
+}: ConversationFileUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -72,16 +78,28 @@ export function JsonlFileUpload({ disabled, onStarted, onError }: ConversationFi
       <Button
         type="button"
         variant="outline"
+        size={compact ? "sm" : "default"}
         disabled={busy}
         onClick={handlePick}
         className={cn(selectedFile && "border-primary/50")}
       >
         <Upload className="h-4 w-4" />
-        {selectedFile ? "Change file" : "Choose JSONL / CSV"}
+        {selectedFile
+          ? compact
+            ? "Change"
+            : "Change file"
+          : compact
+            ? "Choose file"
+            : "Choose JSONL / CSV"}
       </Button>
 
       {selectedFile ? (
-        <span className="inline-flex max-w-[220px] items-center gap-1 truncate rounded-md border bg-muted/50 px-2 py-1 text-xs">
+        <span
+          className={cn(
+            "inline-flex items-center gap-1 truncate rounded-md border bg-muted/50 px-2 py-1 text-xs",
+            compact ? "max-w-[140px] sm:max-w-[200px]" : "max-w-[220px]"
+          )}
+        >
           <span className="truncate" title={selectedFile.name}>
             {selectedFile.name}
           </span>
@@ -97,13 +115,18 @@ export function JsonlFileUpload({ disabled, onStarted, onError }: ConversationFi
         </span>
       ) : null}
 
-      <Button type="button" disabled={busy || !selectedFile} onClick={() => void handleUpload()}>
+      <Button
+        type="button"
+        size={compact ? "sm" : "default"}
+        disabled={busy || !selectedFile}
+        onClick={() => void handleUpload()}
+      >
         {uploading ? (
           <Loader2 className="h-4 w-4 animate-spin" />
         ) : (
           <Upload className="h-4 w-4" />
         )}
-        {uploading ? "Starting…" : "Upload & analyze"}
+        {uploading ? "Starting…" : compact ? "Analyze" : "Upload & analyze"}
       </Button>
     </div>
   );

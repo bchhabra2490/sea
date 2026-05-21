@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app import __version__
 from app.api.bot_routes import router as bot_router
+from app.api.docs_routes import router as docs_router
 from app.api.routes import router
 from app.api.static import mount_frontend
 from app.utils.config import validate_supabase_config
@@ -51,6 +52,7 @@ def health() -> dict[str, str]:
 
 app.include_router(router)
 app.include_router(bot_router)
+app.include_router(docs_router)
 
 _frontend_mounted = mount_frontend(app)
 

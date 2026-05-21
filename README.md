@@ -300,12 +300,20 @@ source .venv/bin/activate
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
+### API documentation
+
+| URL | Format | Description |
+|-----|--------|-------------|
+| [/api/docs](/api/docs) | JSON | Endpoint catalog + classification curl examples |
+| [/docs](/docs) | OpenAPI | Interactive Swagger UI |
+
 ### Endpoints
 
 | Method | Path | Description |
 |--------|------|-------------|
 | `GET` | `/` | Insights dashboard (when `frontend/dist` exists) |
 | `GET` | `/health` | Health check |
+| `GET` | `/api/docs` | API catalog JSON (classification usage) |
 | `GET` | `/insights` | Aggregated dashboard payload |
 | `GET` | `/bot/status` | Whether real-time classification is available |
 | `POST` | `/bot/classify` | Embed a message and assign nearest topic cluster |

@@ -68,9 +68,7 @@ def bot_history(limit: int = 50) -> BotHistoryResponse:
 
 @router.post("/chat", response_model=BotChatResponse)
 def bot_chat(request: BotChatRequest) -> BotChatResponse:
-    """
-    Handle a user chat message: classify, agent reply, append to JSONL, add to clusters.
-    """
+    """Classify, generate agent reply, and persist the turn to Supabase."""
     _require_api_key()
     service = get_bot_service()
     if not service.is_ready():

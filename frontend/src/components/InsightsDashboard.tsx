@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { AlertCircle, Loader2, Play, RefreshCw, Sparkles, Trash2 } from "lucide-react";
+import { AlertCircle, Loader2, Trash2 } from "lucide-react";
 import {
   fetchInsights,
   fetchPipelineStatus,
@@ -14,7 +14,7 @@ import { StatCard } from "@/components/StatCard";
 import { TopicCards } from "@/components/TopicCards";
 import { ClusterDistribution } from "@/components/ClusterDistribution";
 import { ConversationTable } from "@/components/ConversationTable";
-import { JsonlFileUpload } from "@/components/JsonlFileUpload";
+import { InsightsHeader } from "@/components/InsightsHeader";
 import { NoiseClusterPanel } from "@/components/NoiseClusterPanel";
 import { PipelineStatusPanel } from "@/components/PipelineStatusPanel";
 
@@ -120,6 +120,24 @@ export function InsightsDashboard() {
   const pipelineBusy = pipelineStatus?.is_running ?? false;
   const ready = data?.ready ?? false;
   const summary = data?.summary;
+  const actionsDisabled = loading || starting || pipelineBusy || resetting;
+
+  const resetButton = (
+    <Button
+      variant="outline"
+      className="border-destructive/50 text-destructive hover:bg-destructive/10"
+      onClick={() => void handleResetData()}
+      disabled={actionsDisabled}
+      title="Delete all conversations, messages, and clusters from Supabase"
+    >
+      {resetting ? (
+        <Loader2 className="h-4 w-4 animate-spin" />
+      ) : (
+        <Trash2 className="h-4 w-4" />
+      )}
+      {resetting ? "Resetting…" : "Reset"}
+    </Button>
+  );
 
   const selectedTopicName =
     selectedCluster !== null && selectedCluster >= 0
@@ -130,62 +148,19 @@ export function InsightsDashboard() {
 
   return (
     <div className="min-h-screen">
-      <header className="border-b bg-card">
-        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-          <div className="flex items-start gap-3">
-            <div className="rounded-lg bg-primary/10 p-2 text-primary">
-              <Sparkles className="h-6 w-6" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight">PM Insights</h1>
-              <p className="text-sm text-muted-foreground">
-                Conversational intelligence from support threads
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-col items-stretch gap-3 sm:items-end">
-            <JsonlFileUpload
-              disabled={loading || starting || pipelineBusy || resetting}
-              onStarted={() => void handleJobStarted()}
-              onError={setError}
-            />
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant="outline"
-                onClick={() => void load()}
-                disabled={loading || starting || pipelineBusy || resetting}
-              >
-                <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-                Refresh
-              </Button>
-              <Button
-                variant="outline"
-                className="border-destructive/50 text-destructive hover:bg-destructive/10"
-                onClick={() => void handleResetData()}
-                disabled={loading || starting || pipelineBusy || resetting}
-              >
-                {resetting ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Trash2 className="h-4 w-4" />
-                )}
-                {resetting ? "Resetting…" : "Reset data"}
-              </Button>
-              <Button
-                onClick={() => void handleStartAnalysis()}
-                disabled={starting || pipelineBusy || resetting}
-              >
-                {starting || pipelineBusy ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Play className="h-4 w-4" />
-                )}
-                {pipelineBusy ? "Pipeline running…" : starting ? "Starting…" : "Sample data"}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <InsightsHeader
+        data={data}
+        pipelineStatus={pipelineStatus}
+        loading={loading}
+        starting={starting}
+        resetting={resetting}
+        actionsDisabled={actionsDisabled}
+        onRefresh={() => void load()}
+        onStartAnalysis={() => void handleStartAnalysis()}
+        onResetData={() => void handleResetData()}
+        onUploadStarted={() => void handleJobStarted()}
+        onError={setError}
+      />
 
       <main className="mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
         {error ? (
@@ -211,12 +186,15 @@ export function InsightsDashboard() {
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>No analysis yet</AlertTitle>
-            <AlertDescription>
-              Upload a <code className="rounded bg-muted px-1">.jsonl</code> or{" "}
-              <code className="rounded bg-muted px-1">.csv</code> file, or click Run analysis to
-              process all conversations already in Supabase. Ensure{" "}
-              <code className="rounded bg-muted px-1">OPENAI_API_KEY</code> and Supabase env vars
-              are set.
+            <AlertDescription className="space-y-3">
+              <p>
+                Upload a <code className="rounded bg-muted px-1">.jsonl</code> or{" "}
+                <code className="rounded bg-muted px-1">.csv</code> file, or click Run analysis to
+                process all conversations already in Supabase. Ensure{" "}
+                <code className="rounded bg-muted px-1">OPENAI_API_KEY</code> and Supabase env vars
+                are set.
+              </p>
+              <div className="flex flex-wrap gap-2">{resetButton}</div>
             </AlertDescription>
           </Alert>
         ) : null}

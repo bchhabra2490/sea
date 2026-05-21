@@ -43,7 +43,7 @@ export default function BotApp() {
             <div>
               <h1 className="text-xl font-bold tracking-tight">Support Chat</h1>
               <p className="text-sm text-muted-foreground">
-                Agent replies with live topic classification · saved to sample JSONL
+                Agent replies with live topic classification · persisted to Supabase
               </p>
             </div>
           </div>
