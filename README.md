@@ -4,6 +4,11 @@ A modular conversational intelligence engine for PM analytics. Phase 1 ingests u
 
 ## Architecture
 
+For reviewers:
+
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)** — diagrams, data flow, module map (1–2 pages).
+- **[REASONING.md](./REASONING.md)** — why Postgres/pgvector, UMAP+HDBSCAN, OpenAI/Supabase SDKs, and rejected alternatives.
+
 ```
 JSONL / DB ingest → preprocess → OpenAI embeddings → UMAP → HDBSCAN → GPT topic labels → Supabase
                                                                                       ↓
