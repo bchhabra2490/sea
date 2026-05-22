@@ -28,7 +28,7 @@ Nowadays, a lot can be done in a month.
 2. Right now, I am determining simple sentiment. But we can further categorize into different emotions.
 3. On platform, provide the API keys for integration into user's present systems.
 4. Scalable Async Processing of New messages using queues implemented with Kafka. Orchasteration of workers using Temporal.
-5. More features on platform for product managers - rename clustering, manual cluster creation by marking sample conversations.
+5. More features on platform for product managers - rename clusters, manual cluster creation by marking sample conversations.
 6. Temporal Intelligence of issues. With time, some issues will reduce and some new issues will come. So, a time based representation of issues.
 
 
